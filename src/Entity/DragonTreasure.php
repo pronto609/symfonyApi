@@ -12,12 +12,14 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\DragonTreasureRepository;
 use Carbon\Carbon;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use function Symfony\Component\String\u;
 
 #[ORM\Entity(repositoryClass: DragonTreasureRepository::class)]
 #[ApiResource(
@@ -38,6 +40,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     ],
     paginationItemsPerPage: 10
 )]
+#[ApiFilter(PropertyFilter::class)]
 class DragonTreasure
 {
     #[ORM\Id]
@@ -101,6 +104,12 @@ class DragonTreasure
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    #[Groups(['treasure:read'])]
+    public function getShortDescription(): ?string
+    {
+        return u($this->description)->truncate(40, '...');
     }
 
     public function setDescription(string $description): static
